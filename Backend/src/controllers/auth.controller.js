@@ -64,17 +64,23 @@ const registerUser = async (req, res) => {
 
 const loginUser = async (req, res) => {
     const { userName, password } = req.body
+
+
     const logUser = await User.findOne({ userName })
     
-
-    const isPasswordCorrect = await bcrypt.compare(password, logUser.password || "")
-    
-    
-    if (!logUser && !isPasswordCorrect) {
-        return res.status(400).json({ error: "Invalid User Creadiantails" })
-
+    if (!logUser) {
+        return res.status(400).json({error:"User Not Found"})
     }
-
+    // console.log(userName);
+    // console.log(password);
+    // console.log(logUser);
+    const isPasswordCorrect = await bcrypt.compare(password, logUser.password)
+    // console.log(isPasswordCorrect);
+    
+    if (!isPasswordCorrect) {
+        return res.status(400).json({error:"Invalid Password"})
+    }
+   
     generateTokenAndSetCookie(logUser._id, res);
 
     
@@ -98,12 +104,6 @@ const logoutUser = (req, res) => {
 
     return res.status(200).json({ message: "User logged out successfully" });
 };
-
-
-
-
-
-
 
 
 
